@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             MenuItemSeeder::class,
             CategorySeeder::class,
             PeriodeSeeder::class,
+            MataPelajaranSeeder::class,
+            TingkatKelasSeeder::class,
         ]);
     }
 }

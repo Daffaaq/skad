@@ -79,6 +79,19 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::create(['name' => 'periode.edit']);
         Permission::create(['name' => 'periode.destroy']);
 
+        //tingkatKelas
+        Permission::create(['name' => 'tingkat-kelas.index']);
+        Permission::create(['name' => 'tingkat-kelas.create']);
+        Permission::create(['name' => 'tingkat-kelas.edit']);
+        Permission::create(['name' => 'tingkat-kelas.destroy']);
+
+        //matapelajaran
+        Permission::create(['name' => 'mata-pelajaran.index']);
+        Permission::create(['name' => 'mata-pelajaran.create']);
+        Permission::create(['name' => 'mata-pelajaran.edit']);
+        Permission::create(['name' => 'mata-pelajaran.destroy']);
+
+
         // create roles 
         $roleUser = Role::create(['name' => 'admin']);
         $roleUser->givePermissionTo([

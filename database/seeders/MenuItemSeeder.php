@@ -72,6 +72,18 @@ class MenuItemSeeder extends Seeder
                     'permission_name' => 'periode.index',
                     'menu_group_id' => 5,
                 ],
+                [
+                    'name' => 'Tingkat Kelas',
+                    'route' => 'master-management/tingkat-kelas',
+                    'permission_name' => 'tingkat-kelas.index',
+                    'menu_group_id' => 5,
+                ],
+                [
+                    'name' => 'Mata Pelajaran',
+                    'route' => 'master-management/mata-pelajaran',
+                    'permission_name' => 'mata-pelajaran.index',
+                    'menu_group_id' => 5,
+                ],
             ]
         );
     }

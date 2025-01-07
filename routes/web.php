@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\kelasdantingkatController;
+use App\Http\Controllers\MatapelajaranController;
 use App\Http\Controllers\Menu\MenuGroupController;
 use App\Http\Controllers\Menu\MenuItemController;
 use App\Http\Controllers\PeriodeController;
@@ -45,6 +47,17 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::resource('periode', PeriodeController::class);
         Route::post('import/periode', [PeriodeController::class, 'import'])->name('periode.import');
         Route::get('export/periode', [PeriodeController::class, 'export'])->name('periode.export');
+
+        //Mata Pelajaran
+        Route::resource('mata-pelajaran',MatapelajaranController::class);
+        Route::post('import/mata-pelajaran', [MatapelajaranController::class, 'import'])->name('mata-pelajaran.import');
+        Route::get('export/mata-pelajaran', [MatapelajaranController::class, 'export'])->name('mata-pelajaran.export');
+
+        //tingkat kelas
+        Route::resource('tingkat-kelas', kelasdantingkatController::class);
+        Route::get('tingkat-kelas/show-kelas/{id}', [kelasdantingkatController::class, 'showkelas'])->name('tingkat-kelas.show-kelas');
+        Route::get('tingkat-kelas/create-kelas/{id}', [kelasdantingkatController::class, 'indexTambahKelas'])->name('tingkat-kelas.create-kelas');
+        Route::post('tingkat-kelas/create-kelas/{id}', [kelasdantingkatController::class, 'tambahkelas'])->name('tingkat-kelas.create-kelas-store');
     });
 
     //user list
