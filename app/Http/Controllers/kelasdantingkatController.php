@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreKelasRequest;
 use App\Http\Requests\StoreTingkatKelasRequest;
+use App\Http\Requests\UpdateTingkatKelasRequest;
+use App\Models\kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -63,7 +65,8 @@ class kelasdantingkatController extends Controller
         return redirect()->route('tingkat-kelas.index')->with('success', 'Tingkat created successfully.');
     }
 
-    public function indexTambahKelas($tingkatId){
+    public function indexTambahKelas($tingkatId)
+    {
         $tingkat = DB::table('tingkats')->where('id', $tingkatId)->first();
         $kelas = DB::table('kelas')->where('tingkat_id', $tingkatId)->get();
         return view('kelasdantingkat.tambahkelas', compact('tingkat', 'kelas'));
@@ -90,7 +93,17 @@ class kelasdantingkatController extends Controller
         return redirect()->route('tingkat-kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
 
-    public function showkelas($tingkatId){
+    public function deleteKelas($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $tingkatId = $kelas->tingkat_id;
+        $kelas->delete();
+        return redirect()->route('tingkat-kelas.show-kelas', ['id' => $tingkatId])->with('success', 'Kelas berhasil dihapus.');
+    }
+
+
+    public function showkelas($tingkatId)
+    {
         $tingkat = DB::table('tingkats')->where('id', $tingkatId)->first();
         $kelas = DB::table('kelas')->where('tingkat_id', $tingkatId)->get();
         return view('kelasdantingkat.showkelas', compact('tingkat', 'kelas'));
@@ -106,17 +119,46 @@ class kelasdantingkatController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $tingkatId)
     {
-        //
+        $tingkat = DB::table('tingkats')->where('id', $tingkatId)->first();
+        $kelas = DB::table('kelas')->where('tingkat_id', $tingkatId)->get();
+        return view('kelasdantingkat.edit', compact('tingkat', 'kelas'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateTingkatKelasRequest $request, string $tingkatId)
     {
-        //
+        // Perbarui data tingkat
+        DB::table('tingkats')->where('id', $tingkatId)->update([
+            'nama_tingkat' => $request->input('nama_tingkat'),
+            'updated_at' => now(),
+        ]);
+
+        // Ambil data kelas yang saat ini ada di database
+        $existingKelas = DB::table('kelas')
+            ->where('tingkat_id', $tingkatId)
+            ->pluck('id')
+            ->toArray();
+
+
+        // Data kelas baru dari request
+        $newKelas = $request->input('nama_kelas');
+
+        foreach ($newKelas as $kelasId => $namaKelas) {
+            // Pastikan ID kelas ada di database
+            if (in_array($kelasId, $existingKelas)) {
+                DB::table('kelas')->where('id', $kelasId)->update([
+                    'nama_kelas' => $namaKelas,
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+
+        return redirect()->route('tingkat-kelas.index')->with('success', 'Tingkat and Kelas updated successfully.');
     }
 
     /**
@@ -124,6 +166,14 @@ class kelasdantingkatController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::transaction(function () use ($id) {
+            // Hapus semua kelas terkait
+            DB::table('kelas')->where('tingkat_id', $id)->delete();
+
+            // Hapus tingkat
+            DB::table('tingkats')->where('id', $id)->delete();
+        });
+
+        return redirect()->route('tingkat-kelas.index')->with('success', 'Tingkat dan kelas terkait berhasil dihapus.');
     }
 }

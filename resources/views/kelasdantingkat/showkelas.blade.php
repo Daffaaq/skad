@@ -12,7 +12,11 @@
         </div>
         <div class="section-body">
             <h2 class="section-title">Daftar Kelas</h2>
-
+            <div class="row">
+                <div class="col-12">
+                    @include('layouts.alert')
+                </div>
+            </div>
             <!-- Daftar Kelas -->
             <div class="card">
                 <div class="card-header">
@@ -25,6 +29,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Nama Kelas</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -32,6 +37,14 @@
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{ $kelasItem->nama_kelas }}</td>
+                                        <td>
+                                            <form action="{{ route('tingkat-kelas.destroy-kelas', $kelasItem->id) }}"
+                                                method="POST" class="ml-2">
+                                                @csrf
+                                                @method('DELETE')
+                                                <i class="fas fa-trash confirm-delete" style="color: red"></i>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
