@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\GuruController;
 use App\Http\Controllers\kelasdantingkatController;
 use App\Http\Controllers\MatapelajaranController;
 use App\Http\Controllers\Menu\MenuGroupController;
@@ -59,6 +60,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('tingkat-kelas/create-kelas/{id}', [kelasdantingkatController::class, 'indexTambahKelas'])->name('tingkat-kelas.create-kelas');
         Route::post('tingkat-kelas/create-kelas/{id}', [kelasdantingkatController::class, 'tambahkelas'])->name('tingkat-kelas.create-kelas-store');
         Route::delete('tingkat-kelas/destroy-kelas/{id}', [kelasdantingkatController::class, 'deleteKelas'])->name('tingkat-kelas.destroy-kelas');
+
+        //guru
+        Route::resource('guru', GuruController::class);
     });
 
     //user list

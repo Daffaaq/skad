@@ -24,6 +24,11 @@ class MenuGroupSeeder extends Seeder
                     'permission_name' => 'dashboard',
                 ],
                 [
+                    'name' => 'Master',
+                    'icon' => 'fas fa-th',
+                    'permisison_name' => 'master.management',
+                ],
+                [
                     'name' => 'Users Management',
                     'icon' => 'fas fa-users',
                     'permission_name' => 'user.management',
@@ -37,12 +42,8 @@ class MenuGroupSeeder extends Seeder
                     'name' => 'Menu Management',
                     'icon' => 'fas fa-bars',
                     'permisison_name' => 'menu.management',
-                ],
-                [
-                    'name' => 'Master',
-                    'icon' => 'fas fa-th',
-                    'permisison_name' => 'master.management',
                 ]
+                
             ]
         );
     }

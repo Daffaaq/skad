@@ -18,6 +18,6 @@ class kelas extends Model
 
     public function tingkat()
     {
-        return $this->belongsTo(tingkat::class);
+        return $this->belongsTo(tingkat::class, 'tingkat_id');
     }
 }
