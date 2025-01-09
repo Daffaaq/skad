@@ -15,6 +15,7 @@ use App\Http\Controllers\RoleAndPermission\ImportPermissionController;
 use App\Http\Controllers\RoleAndPermission\ImportRoleController;
 use App\Http\Controllers\RoleAndPermission\PermissionController;
 use App\Http\Controllers\RoleAndPermission\RoleController;
+use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\UserController;
@@ -63,6 +64,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         //guru
         Route::resource('guru', GuruController::class);
+
+        //siswa
+        Route::resource('siswa', SiswaController::class);
     });
 
     //user list

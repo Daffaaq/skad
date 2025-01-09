@@ -13,7 +13,9 @@ class siswa extends Model
 
     protected $fillable = [
         'nama_siswa',
+        'nama_panggilan_siswa',
         'nis',
+        'nisn',
         'jenis_kelamin_siswa',
         'tanggal_lahir_siswa',
         'agama_siswa',
@@ -26,7 +28,8 @@ class siswa extends Model
         'nama_ibu_siswa',
         'no_hp_ibu_siswa',
         'no_hp_ayah_siswa',
-        'pekerjaan_orang_tua',
+        'pekerjaan_ibu_siswa',
+        'pekerjaan_ayah_siswa',
         'tanggal_kelulusan',
         'email_siswa',
         'status_aktif_siswa',

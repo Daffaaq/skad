@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('siswas', function (Blueprint $table) {
             $table->id();
             $table->string('nama_siswa');
+            $table->string('nama_panggilan_siswa');
             $table->string('nis')->unique();  // Nomor Induk Siswa (unik)
+            $table->string('nisn')->unique();  // Nomor Induk Siswa (unik)
             $table->enum('jenis_kelamin_siswa', ['Laki-Laki', 'Perempuan']);
             $table->date('tanggal_lahir_siswa');
             $table->enum('agama_siswa', ['Islam', 'Kristen', 'Katolik', 'budha', 'hindu', 'khonghucu']);
@@ -27,7 +29,8 @@ return new class extends Migration
             $table->string('nama_ibu_siswa')->nullable();
             $table->string('no_hp_ibu_siswa')->nullable();
             $table->string('no_hp_ayah_siswa')->nullable();
-            $table->string('pekerjaan_orang_tua')->nullable();
+            $table->string('pekerjaan_ibu_siswa')->nullable();
+            $table->string('pekerjaan_ayah_siswa')->nullable();
             $table->date('tanggal_kelulusan')->nullable();
             $table->string('email_siswa')->nullable()->unique(); // Menyimpan email yang unik
             $table->enum('status_aktif_siswa', ['Aktif', 'Lulus', 'Dropout'])->default('Aktif');

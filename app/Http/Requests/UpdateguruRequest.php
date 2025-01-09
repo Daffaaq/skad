@@ -24,6 +24,7 @@ class UpdateguruRequest extends FormRequest
     {
         return [
             'nama_guru' => 'required|string|max:255',
+            'nama_pendek_guru' => 'required|string|max:255',
             'nip' => 'nullable|string|max:255',
             'jenis_kelamin_guru' => 'required|in:Laki-Laki,Perempuan',
             'status_guru' => 'required|in:PNS,Honorer',
@@ -31,11 +32,13 @@ class UpdateguruRequest extends FormRequest
             'alamat_guru' => 'required|string|max:255',
             'tanggal_lahir_guru' => 'nullable|date',
             'agama_guru' => 'required|in:Islam,Kristen,Katolik,budha,hindu,khonghucu',
+            'status_perkawinan_guru' => 'required|in:Belum Menikah,Menikah,Duda,Janda',
             'pendidikan_terakhir' => 'nullable|string|max:255',
             'tanggal_bergabung' => 'nullable|date',
             'email_guru' => 'required|string|email|max:255|' . Rule::unique('gurus')->ignore($this->route('guru')),
             'foto_guru' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status_aktif_guru' => 'required|in:Aktif,Pensiun',
+            'jabatan_guru' => 'nullable|in:Kepala Sekolah,Wakil Kepala Sekolah,Waka Akademik,Waka Kesiswaan,Waka SarPras,Waka Humas',
         ];
     }
 }

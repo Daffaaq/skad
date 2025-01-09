@@ -22,8 +22,8 @@ class GuruController extends Controller
             ->when($request->input('nama_guru'), function ($query, $nama_guru) {
                 return $query->where('nama_guru', 'like', '%' . $nama_guru . '%');
             })
-        ->select('nama_guru', 'status_guru', 'nip', 'id')
-        ->paginate(10);
+            ->select('nama_guru', 'status_guru', 'nip', 'id')
+            ->paginate(10);
         return view('guru.index', compact('guru'));
     }
 
@@ -52,7 +52,7 @@ class GuruController extends Controller
             $defaultPassword = Hash::make('password');
             // Membuat user
             $user = User::create([
-                'name' => $request['nama_guru'],
+                'name' => $request['nama_pendek_guru'],
                 'email' => $request['email_guru'],
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
@@ -60,9 +60,12 @@ class GuruController extends Controller
             // dd($user);
             // Memberikan peran 'guru' setelah user dibuat
             $user->assignRole('guru');
-
+            $nomorSK = $this->generateNoSK($request->tanggal_bergabung);
+            $kodeGuru = $this->generateKodeGuru($request->nama_guru);
             // Simpan data guru
             DB::table('gurus')->insert([
+                'nama_pendek_guru' => $request->nama_pendek_guru,
+                'nomor_sk' => $nomorSK ?? null,
                 'nama_guru' => $request->nama_guru,
                 'nip' => $request->nip ?? null,
                 'jenis_kelamin_guru' => $request->jenis_kelamin_guru,
@@ -76,6 +79,9 @@ class GuruController extends Controller
                 'email_guru' => $request->email_guru ?? null,
                 'foto_guru' => $fotoPath,
                 'status_aktif_guru' => $request->status_aktif_guru,
+                'status_perkawinan_guru' => $request->status_perkawinan_guru,
+                'jabatan_guru' => $request->jabatan_guru,
+                'kode_guru' => $kodeGuru,
                 'user_id' => $user->id,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -88,10 +94,119 @@ class GuruController extends Controller
             DB::rollback(); // Membatalkan transaksi jika terjadi kesalahan
 
             // Tangani error
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return redirect()->route('guru.index')->with(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
+    private function generateKodeGuru($namaGuru)
+    {
+        if (!$namaGuru) {
+            return null; // Jika nama guru kosong, kode guru juga null
+        }
+
+        // Ambil semua kode guru yang sudah ada di database
+        $existingCodes = DB::table('gurus')->pluck('kode_guru')->toArray();
+
+        // Pisahkan nama berdasarkan spasi
+        $parts = explode(' ', $namaGuru);
+
+        // Ambil huruf pertama dari setiap kata (maksimal 3 kata pertama)
+        $initials = array_map(function ($part) {
+            return strtoupper(substr($part, 0, 1));
+        }, array_slice($parts, 0, 3));
+
+        // Gabungkan menjadi string awal (maksimal 3 huruf)
+        $kodeGuru = implode('', $initials);
+
+        // Pastikan panjang kode maksimal 3 huruf
+        $kodeGuru = substr($kodeGuru, 0, 3);
+
+        // Cek apakah kode sudah ada di daftar existingCodes
+        $additionalIndex = 0;
+        $lastPart = end($parts); // Ambil nama terakhir
+        while (in_array($kodeGuru, $existingCodes)) {
+            if (isset($lastPart[$additionalIndex])) {
+                // Tambahkan huruf berikutnya dari nama belakang
+                $kodeGuru = substr($kodeGuru, 0, 2) . strtoupper($lastPart[$additionalIndex]);
+                $additionalIndex++;
+            } else {
+                // Jika semua huruf belakang habis, tambahkan huruf dari nama depan atau angka
+                if ($additionalIndex < strlen($namaGuru)) {
+                    $kodeGuru .= strtoupper(substr($namaGuru, $additionalIndex % strlen($namaGuru), 1));
+                } else {
+                    $kodeGuru .= (string)($additionalIndex % 10); // Tambahkan angka jika semua sudah habis
+                }
+                $additionalIndex++;
+            }
+
+            // Batasi maksimal panjang kode menjadi 4 huruf jika semua kemungkinan gagal
+            if (strlen($kodeGuru) > 4) {
+                break;
+            }
+        }
+        // dd($existingCodes, $kodeGuru);
+        // Kembalikan kode unik
+        return $kodeGuru;
+    }
+
+    private function generateNoSK($tanggalBergabung)
+    {
+        if (is_null($tanggalBergabung)) {
+            return null;
+        }
+
+        // Mengonversi tanggal bergabung ke Carbon instance
+        $date = \Carbon\Carbon::parse($tanggalBergabung);
+
+        // Mendapatkan bulan dalam angka Romawi
+        $bulanRomawi = $this->convertMonthToRoman($date->month);
+
+        // Mendapatkan tahun
+        $tahun = $date->year;
+
+        // Mendapatkan bagian tetap dari SK
+        $bagianTetap = 'SMP1/HUMAS';
+
+        // Mendapatkan jumlah SK yang sudah ada untuk bulan dan tahun tersebut
+        $jumlahSK = DB::table('gurus')
+            ->whereYear('tanggal_bergabung', $tahun)
+            ->whereMonth('tanggal_bergabung', $date->month)
+            ->count();
+
+        // Menambahkan 1 ke jumlah SK untuk mendapatkan nomor urut berikutnya
+        $nomorUrut = str_pad($jumlahSK + 1, 3, '0', STR_PAD_LEFT);
+
+        // Menyusun nomor SK
+        $nomorSK = "{$nomorUrut}/SK/BUP/{$bagianTetap}/{$bulanRomawi}/{$tahun}";
+
+        return $nomorSK;
+    }
+
+    /**
+     * Mengonversi bulan angka ke Romawi.
+     *
+     * @param int $month
+     * @return string
+     */
+    private function convertMonthToRoman($month)
+    {
+        $romawi = [
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
+        ];
+
+        return $romawi[$month] ?? 'I';
+    }
 
 
     /**
@@ -171,8 +286,13 @@ class GuruController extends Controller
                 $fotoPath = $request->file('foto_guru')->store('foto_guru', 'public');
             }
 
+            $nomorSK = $this->generateNoSK($request->tanggal_bergabung);
+            $kodeGuru = $this->generateKodeGuru($request->nama_guru);
+
             // Memperbarui data guru
             DB::table('gurus')->where('id', $id)->update([
+                'nama_pendek_guru' => $request->nama_pendek_guru,
+                'nomor_sk' => $nomorSK ?? null,
                 'nama_guru' => $request->nama_guru,
                 'nip' => $request->nip ?? null,
                 'jenis_kelamin_guru' => $request->jenis_kelamin_guru,
@@ -186,6 +306,9 @@ class GuruController extends Controller
                 'email_guru' => $request->email_guru ?? null,
                 'foto_guru' => $fotoPath,
                 'status_aktif_guru' => $request->status_aktif_guru,
+                'status_perkawinan_guru' => $request->status_perkawinan_guru,
+                'jabatan_guru' => $request->jabatan_guru,
+                'kode_guru' => $kodeGuru,
                 'updated_at' => now(),
             ]);
 
@@ -196,7 +319,7 @@ class GuruController extends Controller
             DB::rollback(); // Membatalkan transaksi jika terjadi kesalahan
 
             // Tangani error
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return redirect()->route('guru.index')->with(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
@@ -237,8 +360,7 @@ class GuruController extends Controller
             DB::rollback(); // Membatalkan transaksi jika terjadi kesalahan
 
             // Tangani error
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return redirect()->route('guru.index')->with(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-
 }

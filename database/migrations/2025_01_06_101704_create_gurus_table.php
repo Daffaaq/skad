@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('gurus', function (Blueprint $table) {
             $table->id();
             $table->string('nama_guru');
+            $table->string('nama_pendek_guru');
             $table->string('nip')->nullable()->unique();
             $table->enum('jenis_kelamin_guru',['Laki-Laki','Perempuan']);
             $table->enum('status_guru',['PNS', 'Honorer']);
@@ -27,6 +28,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index();
             $table->string('email_guru')->unique(); // Menyimpan email yang unik
             $table->enum('status_aktif_guru', ['Aktif', 'Pensiun'])->default('Aktif');
+            $table->string('nomor_sk')->nullable();
+            $table->string('kode_guru')->nullable()->unique();
+            $table->enum('status_perkawinan_guru',['Belum Menikah', 'Menikah', 'Duda', 'Janda']);
+            $table->enum('jabatan_guru',['Kepala Sekolah', 'Wakil Kepala Sekolah', 'Waka Akademik', 'Waka Kesiswaan', 'Waka SarPras', 'Waka Humas'])->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
