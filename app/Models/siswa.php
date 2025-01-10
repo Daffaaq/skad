@@ -39,4 +39,21 @@ class siswa extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function kelas()
+    {
+        return $this->belongsToMany(Kelas::class, 'siswatokelas', 'siswa_id', 'kelas_id')
+            ->withPivot('periode_id')
+            ->withTimestamps();
+    }
+
+    public function jadwals()
+    {
+        return $this->hasManyThrough(Jadwal::class, SiswaToKelas::class, 'siswa_id', 'kelas_id', 'id', 'kelas_id');
+    }
+
+    public function siswatokelas()
+    {
+        return $this->hasMany(Siswatokelas::class, 'siswa_id');
+    }
 }

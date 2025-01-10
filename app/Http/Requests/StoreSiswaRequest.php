@@ -24,7 +24,7 @@ class StoreSiswaRequest extends FormRequest
         return [
             'nama_siswa' => 'required|string|max:255',
             'nama_panggilan_siswa' => 'required|string|max:255',
-            'nisn' => 'nullable|unique:siswas,nisn|string|max:20',
+            'nisn' => 'required|unique:siswas,nisn|string|max:20',
             'jenis_kelamin_siswa' => 'required|in:Laki-Laki,Perempuan',
             'tanggal_lahir_siswa' => 'required|date',
             'agama_siswa' => 'required|in:Islam,Kristen,Katolik,budha,hindu,khonghucu',

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('no_hp_guru');
             $table->longText('alamat_guru');
             $table->date('tanggal_lahir_guru')->nullable(); // Nullable jika tidak ingin wajib diisi
-            $table->enum('agama_guru',['Islam', 'Kristen', 'Katolik', 'budha', 'hindu', 'khonghucu']);
+            $table->enum('agama_guru',['Islam', 'Kristen', 'Katolik', 'Budha', 'Hindu', 'Khonghucu']);
             $table->string('foto_guru')->nullable(); // Menyimpan path foto guru
             $table->date('tanggal_bergabung')->nullable();
             $table->string('pendidikan_terakhir')->nullable();

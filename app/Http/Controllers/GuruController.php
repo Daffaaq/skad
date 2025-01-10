@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreguruRequest;
+use App\Http\Requests\StoreImportGuruRequest;
 use App\Http\Requests\UpdateguruRequest;
 use App\Models\guru;
 use App\Models\User;
+use App\Imports\GuruImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -363,4 +366,43 @@ class GuruController extends Controller
             return redirect()->route('guru.index')->with(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
+
+    // public function import(StoreImportGuruRequest $request)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Mengimpor data
+    //         Excel::import(new GuruImport, $request->file('file'));
+
+    //         // Simpan perubahan ke database
+    //         DB::commit();
+    //         // return json
+    //         return response()->json(['success' => 'Data berhasil diimpor!']);
+    //         // return redirect()->route('guru.index')->with('success', 'Data berhasil diimpor!');
+    //     } catch (\Exception $e) {
+    //         // Batalkan transaksi jika ada kesalahan
+    //         DB::rollback();
+
+    //         return redirect()->route('guru.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    //     }
+    // }
+
+    public function import(Request $request)
+    {
+        $validated = $request->validate([
+            'import_file' => 'required|mimes:xlsx,xls,csv|max:10240', // memvalidasi file yang diunggah
+        ]);
+
+        if ($request->hasFile('import_file')) {
+            $file = $request->file('import_file');
+            // Memproses file dan menyimpan data guru
+            Excel::import(new GuruImport, $file); // Pastikan Anda sudah mengimpor kelas Excel dan sudah di-setup
+            return redirect()->route('guru.index')->with('success', 'Data guru berhasil diimpor.');
+        }
+
+        return redirect()->route('guru.index')->with('error', 'File gagal diimpor.');
+    }
+
+
 }

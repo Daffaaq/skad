@@ -56,50 +56,57 @@ class MenuItemSeeder extends Seeder
                     'permission_name' => 'siswa.index',
                     'menu_group_id' => 2,
                 ],
+                // Akademik Management
+                [
+                    'name' => 'Siswa To Kelas',
+                    'route' => 'akademik-management/siswa-kelas',
+                    'permission_name' => 'siswa-kelas.index',
+                    'menu_group_id' => 3,
+                ],
                 // Users Management
                 [
                     'name' => 'User List',
                     'route' => 'user-management/user',
                     'permission_name' => 'user.index',
-                    'menu_group_id' => 3,
+                    'menu_group_id' => 4,
                 ],
                 // Role Management
                 [
                     'name' => 'Role List',
                     'route' => 'role-and-permission/role',
                     'permission_name' => 'role.index',
-                    'menu_group_id' => 4,
+                    'menu_group_id' => 5,
                 ],
                 [
                     'name' => 'Permission List',
                     'route' => 'role-and-permission/permission',
                     'permission_name' => 'permission.index',
-                    'menu_group_id' => 4,
+                    'menu_group_id' => 5,
                 ],
                 [
                     'name' => 'Permission To Role',
                     'route' => 'role-and-permission/assign',
                     'permission_name' => 'assign.index',
-                    'menu_group_id' => 4,
+                    'menu_group_id' => 5,
                 ],
                 [
                     'name' => 'User To Role',
                     'route' => 'role-and-permission/assign-user',
                     'permission_name' => 'assign.user.index',
-                    'menu_group_id' => 4,
+                    'menu_group_id' => 5,
                 ],
                 // Menu Management
                 [
                     'name' => 'Menu Group',
                     'route' => 'menu-management/menu-group',
                     'permission_name' => 'menu-group.index',
-                    'menu_group_id' => 5,
+                    'menu_group_id' => 6,
                 ],
                 [
                     'name' => 'Menu Item',
                     'route' => 'menu-management/menu-item',
                     'permission_name' => 'menu-item.index',
-                    'menu_group_id' => 5,
+                    'menu_group_id' => 6,
                 ],
             ]
         );

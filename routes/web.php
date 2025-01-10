@@ -16,6 +16,7 @@ use App\Http\Controllers\RoleAndPermission\ImportRoleController;
 use App\Http\Controllers\RoleAndPermission\PermissionController;
 use App\Http\Controllers\RoleAndPermission\RoleController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\SiswaToKelasController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\UserController;
@@ -64,9 +65,18 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         //guru
         Route::resource('guru', GuruController::class);
+        Route::post('guru/import', [GuruController::class, 'import'])->name('guru.import');
 
         //siswa
         Route::resource('siswa', SiswaController::class);
+        Route::post('/siswa/import', [SiswaController::class, 'importSiswa'])->name('siswa.import');
+
+    });
+
+    // akademik management
+    Route::group(['prefix' => 'akademik-management'], function () {
+        // siswa to kelas
+        Route::resource('siswa-kelas', SiswaToKelasController::class);
     });
 
     //user list

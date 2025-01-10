@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('nisn')->unique();  // Nomor Induk Siswa (unik)
             $table->enum('jenis_kelamin_siswa', ['Laki-Laki', 'Perempuan']);
             $table->date('tanggal_lahir_siswa');
-            $table->enum('agama_siswa', ['Islam', 'Kristen', 'Katolik', 'budha', 'hindu', 'khonghucu']);
+            $table->enum('agama_siswa', ['Islam', 'Kristen', 'Katolik', 'Budha', 'Hindu', 'Khonghucu']);
             $table->string('foto_siswa')->nullable(); // Menyimpan path foto siswa
             $table->string('no_hp_siswa')->nullable();
             $table->string('alamat_siswa');

@@ -26,6 +26,7 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::create(['name' => 'role.permission.management']);
         Permission::create(['name' => 'menu.management']);
         Permission::create(['name' => 'master.management']);
+        Permission::create(['name' => 'akademik.management']);
         //user
         Permission::create(['name' => 'user.index']);
         Permission::create(['name' => 'user.create']);
@@ -102,6 +103,12 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::create(['name' => 'siswa.create']);
         Permission::create(['name' => 'siswa.edit']);
         Permission::create(['name' => 'siswa.destroy']);
+
+        //Siswa To Kelas
+        Permission::create(['name' => 'siswa-kelas.index']);
+        Permission::create(['name' => 'siswa-kelas.create']);
+        Permission::create(['name' => 'siswa-kelas.edit']);
+        Permission::create(['name' => 'siswa-kelas.destroy']);
 
         // create roles 
         $roleUser = Role::create(['name' => 'admin']);

@@ -20,4 +20,9 @@ class periode extends Model
         'periode_kepala_sekolah',
         'periode_nip',
     ];
+
+    public function jadwals()
+    {
+        return $this->hasMany(Jadwal::class);
+    }
 }

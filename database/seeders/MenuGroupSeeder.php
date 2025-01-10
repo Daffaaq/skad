@@ -24,9 +24,14 @@ class MenuGroupSeeder extends Seeder
                     'permission_name' => 'dashboard',
                 ],
                 [
-                    'name' => 'Master',
+                    'name' => 'Master Management',
                     'icon' => 'fas fa-th',
                     'permisison_name' => 'master.management',
+                ],
+                [
+                    'name' => 'Akademik Management',
+                    'icon' => 'fas fa-graduation-cap',
+                    'permisison_name' => 'akademik.management',
                 ],
                 [
                     'name' => 'Users Management',

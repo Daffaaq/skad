@@ -16,7 +16,7 @@ class PeriodeSeeder extends Seeder
         DB::table('periodes')->insert([
             [
                 'nama_periode' => '2024/2025',
-                'status_periode' => 'nonAktif',
+                'status_periode' => 'Aktif',
                 'periode_kepala_sekolah' => 'Dr. Ahmad Fauzi',
                 'periode_nip' => '198405112010011002',
                 'created_at' => now(),

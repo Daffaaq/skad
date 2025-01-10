@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSiswaRequest;
 use App\Http\Requests\UpdateSiswaRequest;
+use App\Imports\SiswaImport;
 use App\Models\siswa;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -256,6 +258,20 @@ class SiswaController extends Controller
 
             // Tangani error
             return redirect()->route('siswa.index')->with(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+    public function importSiswa(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new SiswaImport, $request->file('import_file'));
+            return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diimpor.');
+        } catch (\Exception $e) {
+            return redirect()->route('siswa.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

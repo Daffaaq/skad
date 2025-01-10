@@ -20,4 +20,16 @@ class kelas extends Model
     {
         return $this->belongsTo(tingkat::class, 'tingkat_id');
     }
+
+    public function siswas()
+    {
+        return $this->belongsToMany(Siswa::class, 'siswatokelas', 'kelas_id', 'siswa_id')
+        ->withPivot('periode_id')
+        ->withTimestamps();
+    }
+
+    public function jadwals()
+    {
+        return $this->hasMany(Jadwal::class);
+    }
 }
