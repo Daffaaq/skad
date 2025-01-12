@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\UserController;
 use App\Models\Category;
+use App\Models\kelas;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,7 +53,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('export/periode', [PeriodeController::class, 'export'])->name('periode.export');
 
         //Mata Pelajaran
-        Route::resource('mata-pelajaran',MatapelajaranController::class);
+        Route::resource('mata-pelajaran', MatapelajaranController::class);
         Route::post('import/mata-pelajaran', [MatapelajaranController::class, 'import'])->name('mata-pelajaran.import');
         Route::get('export/mata-pelajaran', [MatapelajaranController::class, 'export'])->name('mata-pelajaran.export');
 
@@ -70,13 +71,15 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         //siswa
         Route::resource('siswa', SiswaController::class);
         Route::post('/siswa/import', [SiswaController::class, 'importSiswa'])->name('siswa.import');
-
     });
 
     // akademik management
     Route::group(['prefix' => 'akademik-management'], function () {
         // siswa to kelas
         Route::resource('siswa-kelas', SiswaToKelasController::class);
+        Route::get('/kelas-by-tingkat/{tingkat_id}', [SiswaToKelasController::class, 'getKelasByTingkat']);
+        Route::post('/siswa-kelas/auto-assign/', [SiswaToKelasController::class, 'randomAssign'])->name('siswa-kelas.autoAssign');
+        Route::get('/siswa-kelas/auto-assign/store', [SiswaToKelasController::class, 'createRandomKelas'])->name('siswa-kelas.random');
     });
 
     //user list
