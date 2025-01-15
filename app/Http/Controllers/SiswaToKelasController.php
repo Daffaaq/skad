@@ -19,39 +19,52 @@ class SiswaToKelasController extends Controller
      */
     public function index(Request $request)
     {
-        // Query utama untuk mengambil data siswa, kelas, tingkat, dan periode
-        $data = DB::table('siswatokelas')
-            ->join('siswas', 'siswatokelas.siswa_id', '=', 'siswas.id')
-            ->join('kelas', 'siswatokelas.kelas_id', '=', 'kelas.id')
-            ->join('tingkats', 'kelas.tingkat_id', '=', 'tingkats.id')
-            ->join('periodes', 'siswatokelas.periode_id', '=', 'periodes.id')
-            ->select(
-                'siswatokelas.id',
-                'siswas.nama_siswa as siswa_nama',
-                'kelas.nama_kelas as kelas_nama',
-                'tingkats.nama_tingkat as tingkat_nama',
-                'periodes.nama_periode as periode_nama',
-            )
-            // Filter berdasarkan nama siswa jika ada input
-            ->when($request->input('nama_siswa'), function ($query, $nama_siswa) {
-                return $query->where('siswas.nama_siswa', 'like', '%' . $nama_siswa . '%');
-            })
-            // Filter berdasarkan tingkat jika checkbox "filter_by_tingkat" diaktifkan
-            ->when($request->input('tingkat_id'), function ($query, $tingkat_id) {
-                return $query->where('kelas.tingkat_id', $tingkat_id);
-            })
-            ->when($request->input('tingkat_id') && $request->input('kelas_id'), function ($query) use ($request) {
-                return $query->where('kelas.tingkat_id', $request->input('tingkat_id'))
-                    ->where('siswatokelas.kelas_id', $request->input('kelas_id'));
-            })
+        $activePeriod = DB::table('periodes')->where('status_periode', 'aktif')->first();
+        $periodes = DB::table('periodes')->get();
 
-            ->paginate(10);
+        if ($activePeriod) {
+            $data = DB::table('siswatokelas')
+                ->join('siswas', 'siswatokelas.siswa_id', '=', 'siswas.id')
+                ->join('kelas', 'siswatokelas.kelas_id', '=', 'kelas.id')
+                ->join('tingkats', 'kelas.tingkat_id', '=', 'tingkats.id')
+                ->join('periodes', 'siswatokelas.periode_id', '=', 'periodes.id')
+                ->select(
+                    'siswatokelas.id',
+                    'siswas.nama_siswa as siswa_nama',
+                    'kelas.nama_kelas as kelas_nama',
+                    'tingkats.nama_tingkat as tingkat_nama',
+                    'periodes.nama_periode as periode_nama'
+                )
+                // Filter berdasarkan nama siswa jika ada input
+                ->when($request->input('nama_siswa'), function ($query, $nama_siswa) {
+                    return $query->where('siswas.nama_siswa', 'like', '%' . $nama_siswa . '%');
+                })
+                // Filter berdasarkan tingkat jika checkbox "filter_by_tingkat" diaktifkan
+                ->when($request->input('tingkat_id'), function ($query, $tingkat_id) {
+                    return $query->where('kelas.tingkat_id', $tingkat_id);
+                })
+                // Filter berdasarkan tingkat dan kelas jika keduanya dipilih
+                ->when($request->input('tingkat_id') && $request->input('kelas_id'), function ($query) use ($request) {
+                    return $query->where('kelas.tingkat_id', $request->input('tingkat_id'))
+                        ->where('siswatokelas.kelas_id', $request->input('kelas_id'));
+                })
+                // Filter berdasarkan periode jika ada
+                ->when($request->input('periode_id'), function ($query, $periode_id) {
+                    return $query->where('siswatokelas.periode_id', $periode_id);
+                })
+                // Tambahkan filter untuk periode aktif hanya jika periode_id diisi
+                ->when($request->input('periode_id'), function ($query) use ($activePeriod) {
+                    return $query->where('siswatokelas.periode_id', $activePeriod->id);
+                })
+                // Jika periode aktif tidak ditemukan, kosongkan data
+                ->paginate(10);
+        } else {
+            $data = collect(); // Kosongkan data
+        }
 
-        // Ambil data tingkat untuk dropdown filter
         $tingkats = Tingkat::all();
 
-
-        return view('siswatokelas.index', compact('data', 'tingkats'));
+        return view('siswatokelas.index', compact('data', 'tingkats', 'periodes'));
     }
 
     // SiswaToKelasController.php

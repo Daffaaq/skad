@@ -35,7 +35,7 @@
                                 <a class="btn btn-info btn-primary active filter">
                                     <i class="fa fa-filter" aria-hidden="true"></i>
                                     Filter</a>
-                                <a href="{{ route('siswa-kelas.random') }}" class="btn btn-icon icon-left btn-warning">
+                                <a href="{{ route('siswa-kelas.random') }}" class="btn btn-icon icon-left btn-primary">
                                     <i class="fas fa-random"></i> Acak Siswa
                                 </a>
                                 </a>
@@ -60,7 +60,13 @@
                                         Filter berdasarkan Tingkat dan Kelas
                                     </label>
                                 </div>
-
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filter_by_periode"
+                                        name="filter_by_periode" {{ request('filter_by_periode') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="filter_by_periode">
+                                        Filter berdasarkan Periode
+                                    </label>
+                                </div>
                             </div>
                             <div class="show-filter mb-3" style="display:none">
                                 <form method="GET" action="{{ route('siswa-kelas.index') }}">
@@ -78,6 +84,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
+                                        <!-- Filter by Kelas -->
                                         <div class="form-group col-md-6" id="kelas_field"
                                             style="{{ request('tingkat_id') ? '' : 'display:none;' }}">
                                             <label for="kelas_id">Kelas</label>
@@ -87,12 +95,28 @@
                                             </select>
                                         </div>
 
+                                        <!-- Filter by Periode -->
+                                        <!-- Form Filter by Periode -->
+                                        <div class="form-group" id="periode_field">
+                                            <label for="periode_id">Periode</label>
+                                            <select name="periode_id" id="periode_id" class="form-control">
+                                                <option value="">Pilih Periode</option>
+                                                @foreach ($periodes as $periode)
+                                                    <option value="{{ $periode->id }}"
+                                                        {{ request('periode_id') == $periode->id ? 'selected' : '' }}>
+                                                        {{ $periode->nama_periode }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
+
                                     <div class="text-right">
                                         <button class="btn btn-primary" type="submit">Filter</button>
                                         <a class="btn btn-secondary" href="{{ route('siswa-kelas.index') }}">Reset</a>
                                     </div>
                                 </form>
+
                             </div>
 
                             <div class="show-search mb-3" style="display: none">
@@ -125,7 +149,7 @@
                                     <tbody>
                                         @forelse ($data as $key => $item)
                                             <tr>
-                                                <td>{{ $key + 1 }}</td>
+                                                <td>{{ $data->firstItem() + $key }}</td>
                                                 <td>{{ $item->siswa_nama }}</td> <!-- Gunakan alias 'siswa_nama' -->
                                                 <td>{{ $item->tingkat_nama }}</td>
                                                 <td>{{ $item->kelas_nama }}</td> <!-- Gunakan alias 'kelas_nama' -->
@@ -201,54 +225,119 @@
     <script>
         $(document).ready(function() {
             // Ketika tombol Filter diklik, toggle filter
-            $('.search').click(function(event) {
+            $(document).on('click', '.search', function(event) {
                 event.stopPropagation();
                 $(".show-search").slideToggle("fast");
                 $(".show-filter").hide();
             });
 
-            $('.filter').click(function(event) {
+            $(document).on('click', '.filter', function(event) {
                 event.stopPropagation();
                 $(".show-filter").slideToggle("fast");
                 $(".show-search").hide();
             });
 
-            // Fungsi untuk menyembunyikan atau menampilkan dropdown berdasarkan checkbox
+            // Elemen-elemen filter
             const $filterByTingkat = $('#filter_by_tingkat');
             const $filterByTingkatDanKelas = $('#filter_by_tingkat_dan_kelas');
+            const $filterByPeriode = $('#filter_by_periode');
             const $tingkatField = $('#tingkat_id').closest('.form-group');
             const $kelasField = $('#kelas_field');
+            const $periodeField = $('#periode_field');
+            const $periodeId = $('#periode_id');
 
+            // Fungsi untuk menampilkan atau menyembunyikan dropdown berdasarkan checkbox
             function toggleDropdown() {
                 if ($filterByTingkat.is(':checked')) {
-                    $tingkatField.show(); // Tampilkan dropdown Tingkat
-                    $kelasField.hide(); // Sembunyikan dropdown Kelas
-                } else if ($filterByTingkatDanKelas.is(':checked')) {
-                    $tingkatField.show(); // Tampilkan dropdown Tingkat
-                    $kelasField.show(); // Tampilkan dropdown Kelas
-                } else {
-                    $tingkatField.hide(); // Sembunyikan keduanya
+                    $tingkatField.show();
                     $kelasField.hide();
+                    $periodeField.hide();
+                } else if ($filterByTingkatDanKelas.is(':checked')) {
+                    $tingkatField.show();
+                    $kelasField.show();
+                    $periodeField.hide();
+                } else if ($filterByPeriode.is(':checked')) {
+                    $tingkatField.hide();
+                    $kelasField.hide();
+                    $periodeField.show();
+                } else {
+                    $tingkatField.hide();
+                    $kelasField.hide();
+                    $periodeField.hide();
                 }
             }
 
             // Logika untuk memilih hanya satu checkbox
             $filterByTingkat.on('change', function() {
                 if ($(this).is(':checked')) {
-                    $filterByTingkatDanKelas.prop('checked', false); // Hapus centang di checkbox lain
+                    $filterByTingkatDanKelas.prop('checked', false);
+                    $filterByPeriode.prop('checked', false);
                 }
                 toggleDropdown();
             });
 
             $filterByTingkatDanKelas.on('change', function() {
                 if ($(this).is(':checked')) {
-                    $filterByTingkat.prop('checked', false); // Hapus centang di checkbox lain
+                    $filterByTingkat.prop('checked', false);
+                    $filterByPeriode.prop('checked', false);
+                }
+                toggleDropdown();
+            });
+
+            $filterByPeriode.on('change', function() {
+                if ($(this).is(':checked')) {
+                    $filterByTingkat.prop('checked', false);
+                    $filterByTingkatDanKelas.prop('checked', false);
                 }
                 toggleDropdown();
             });
 
             // Jalankan fungsi untuk mengatur dropdown berdasarkan status awal checkbox
             toggleDropdown();
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action="{{ route('siswa-kelas.index') }}"]');
+
+            form.addEventListener('submit', function(event) {
+                // Prevent form submission to manipulate URL parameters first
+                event.preventDefault();
+
+                // Get all form elements
+                const tingkatField = document.querySelector('#tingkat_id');
+                const kelasField = document.querySelector('#kelas_id');
+                const periodeField = document.querySelector('#periode_id');
+
+                // Initialize query parameters
+                let params = new URLSearchParams();
+
+                // Determine which checkbox is checked
+                const filterByTingkat = document.querySelector('#filter_by_tingkat').checked;
+                const filterByTingkatDanKelas = document.querySelector('#filter_by_tingkat_dan_kelas')
+                    .checked;
+                const filterByPeriode = document.querySelector('#filter_by_periode').checked;
+
+                // Add relevant parameters based on active filter
+                if (filterByTingkat) {
+                    if (tingkatField.value) {
+                        params.append('tingkat_id', tingkatField.value);
+                    }
+                } else if (filterByTingkatDanKelas) {
+                    if (tingkatField.value) {
+                        params.append('tingkat_id', tingkatField.value);
+                    }
+                    if (kelasField.value) {
+                        params.append('kelas_id', kelasField.value);
+                    }
+                } else if (filterByPeriode) {
+                    if (periodeField.value) {
+                        params.append('periode_id', periodeField.value);
+                    }
+                }
+
+                // Redirect to the filtered URL
+                const baseUrl = '{{ route('siswa-kelas.index') }}';
+                window.location.href = `${baseUrl}?${params.toString()}`;
+            });
         });
     </script>
 @endpush
